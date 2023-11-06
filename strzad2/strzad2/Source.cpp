@@ -51,9 +51,9 @@ Position createPerson()
 		return NULL;
 	}
 	printf("Enter name: ");
-	scanf(" %s", name);
+	scanf(" %s", &name);
 	printf("Enter surname: ");
-	scanf(" %s", surname);
+	scanf(" %s", &surname);
 	printf("Enter birth year: ");
 	scanf(" %d", &birthYear);
 
@@ -189,7 +189,7 @@ int menu(Position Head)
 {
 	char choice = '\0';
 	while (1) {
-		scanf(" %c", choice);
+		scanf(" %c", &choice);
 		if (choice == 'a')
 			appendList(Head);
 		else if (choice == 'e')
