@@ -1,0 +1,20 @@
+﻿  Source.cpp
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(32): error C2059: syntax error: '.'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(32): error C2143: syntax error: missing ';' before '{'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(32): error C2143: syntax error: missing ';' before '}'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(32): error C2059: syntax error: ','
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(33): error C2065: 'Head': undeclared identifier
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(33): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(33): error C2365: 'menu': redefinition; previous definition was 'function'
+  c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(26): note: see declaration of 'menu'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(35): error C2059: syntax error: 'return'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(36): error C2059: syntax error: '}'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(36): error C2143: syntax error: missing ';' before '}'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(39): error C2447: '{': missing function header (old-style formal list?)
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(69): warning C4477: 'scanf' : format string '%c' requires an argument of type 'char *', but variadic argument 1 has type 'int'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(89): error C2039: 'Next': is not a member of '_Person'
+  c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(10): note: see declaration of '_Person'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(90): error C2143: syntax error: missing ';' before 'else'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(92): error C2143: syntax error: missing ';' before 'else'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(94): error C2143: syntax error: missing ';' before '}'
+c:\users\milic\desktop\strukture\strzad2\strzad2\source.cpp(96): error C2143: syntax error: missing ';' before '}'
