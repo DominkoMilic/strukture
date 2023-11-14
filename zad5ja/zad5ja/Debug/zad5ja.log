@@ -1,0 +1,3 @@
+﻿  zad5ja.c
+c:\users\milic\desktop\strukture\zad5ja\zad5ja\zad5ja.c(26): warning C4013: 'readFile' undefined; assuming extern returning int
+  zad5ja.vcxproj -> C:\Users\Milic\Desktop\strukture\zad5ja\Debug\zad5ja.exe
