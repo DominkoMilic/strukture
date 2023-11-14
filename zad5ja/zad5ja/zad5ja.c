@@ -23,7 +23,7 @@ int main()
 	numbers head = { .value = 0.0,.next = NULL };
 	double result = 0.0;
 	char* fileName = "postfix.txt";
-	if (readFile(fileName, &head, &result) == EXIT_SUCCESS) {
+	if (readFileAndCalculate(fileName, &head, &result) == EXIT_SUCCESS) {
 		printf("Result is: %0.5lf\n", result);
 	}
 
@@ -97,7 +97,7 @@ int toDelete(Position head)
 	return EXIT_SUCCESS;
 }
 
-int readFile(char* fileName, Position head, double* result)
+int readFileAndCalculate(char* fileName, Position head, double* result)
 {
 	char buffer[MAX_LENGTH] = { 0 };
 	double number = 0;
