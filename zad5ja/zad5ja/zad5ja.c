@@ -85,7 +85,6 @@ int calculate(char operation, double* result, Position head)
 int toDelete(Position head)
 {
 	Position current = NULL;
-	current = (Position)malloc(sizeof(numbers));
 	current = head->next;
 	if (!current)
 	{
