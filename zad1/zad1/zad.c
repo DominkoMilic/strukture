@@ -15,6 +15,10 @@ typedef struct _student {
 
 
 Student* allocateMemory(int noStudents);
+Student* ReadStudents(int noStudents);
+double calculateRelativePoints(double points);
+int showStudents(int noStudents, Student* students);
+
 
 Student* allocateMemory(int noStudents)
 {
@@ -29,7 +33,6 @@ Student* allocateMemory(int noStudents)
 
 }
 
-Student* ReadStudents(int noStudents);
 
 Student* ReadStudents(int noStudents)
 {
@@ -57,7 +60,7 @@ Student* ReadStudents(int noStudents)
 
 
 int readNoRowsInFile() {
-	int cnt = 0, i = 0;
+	int counter = 0, i = 0;
 	FILE* filePointer = NULL;
 	char buffer[MAX_LINE] = { 0 };
 	filePointer = fopen("students.txt", "r");
@@ -67,21 +70,19 @@ int readNoRowsInFile() {
 	}
 	while (!feof(filePointer)) {
 		if (fgetc(filePointer) == '\n')
-			cnt++;
+			counter++;
 		i++;
 	}
 
-	return cnt;
+	return counter;
 }
 
-double calculateRelativePoints(double points);
 
 double calculateRelativePoints(double points)
 {
 	return ((points / MAX_POINTS) * 100);
 }
 
-int showStudents(int noStudents, Student* students);
 
 int showStudents(int noStudents, Student* students)
 {
