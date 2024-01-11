@@ -19,7 +19,6 @@ typedef struct _Person
 	Position next;
 } Person;
 
-int menu(Position head);
 Position createPerson();
 Position findLast(Position head);
 char* enterSurname();
@@ -37,8 +36,13 @@ int main(int argc, char** argv)
 {
 	Person Head = { .next = NULL,.name = {0},.surname = {0},.birthYear = 0 };
 
-	menu(&Head);
-
+	insertAtFrontOfTheList(&Head);
+	insertAtFrontOfTheList(&Head);
+	insertAtEndOfTheList(&Head);
+	insertAtEndOfTheList(&Head);
+	findPerson(&Head);
+	deletePerson(&Head);
+	printList(&Head);
 
 	return EXIT_SUCCESS;
 }
@@ -79,12 +83,13 @@ Position findPrevious(Position head)
 		}
 	} while (current->next != NULL);
 
+	return current;
 }
 
 
 Position findLast(Position Head)
 {
-	Position current = head;
+	Position current = Head;
 	while (current->next)
 	{
 		current = current->next;
@@ -150,8 +155,8 @@ Position createPerson()
 
 int printList(Position first)
 {
-	Position current = firstItem;
-	if (!firstItem)
+	Position current = first;
+	if (!first)
 	{
 		printf("empty list\n");
 	}
@@ -164,6 +169,12 @@ int printList(Position first)
 	return EXIT_SUCCESS;
 }
 
+int printPerson(Position person)
+{
+	printf("name: %s\nsurname: %s\nbirth year: %d\n", person->name, person->surname, person->birthYear);
+	return EXIT_SUCCESS;
+}
+
 char* enterSurname()
 {
 	char surname[MAX_LENGTH] = { 0 };
@@ -172,11 +183,11 @@ char* enterSurname()
 	return surname;
 }
 
-int findPerson(Position head)
+Position findPerson(Position head)
 {
-	Position current = firtsItem;
+	Position current = head;
 	char surname[MAX_LENGTH] = { 0 };
-	if (!firstItem)
+	if (!head)
 	{
 		printf("Empty list\n");
 		return NO_PERSON_FOUND;
@@ -229,89 +240,4 @@ int deletePerson(Position head)
 }
 
 
-int printPerson(Position person)
-{
-	printf("name: %s\nsurname: %s\nbirth year: %d\n", person->name, person->surname, person->birthYear);
-	return EXIT_SUCCESS;
-}
 
-
-int menu(Position head) {
-	char choice = '\0';
-	Position person = NULL;
-	Position previous = NULL;
-	while (1) scanf(" %c", &choice);
-		switch (choice) {
-		case 'a':
-			insertAtFrontOfTheList(head);
-			continue;
-		case 'e':
-			insertAtEndOfTheList(head);
-			continue;
-		case 'p':
-			printList(head->next);
-			continue;
-		case 's':
-			person = findPerson(head->next);
-			person ? printPerson(person) : printf("Can't find person with that surname!\n");
-			continue;
-		case 'd':
-			switch (deletePerson(head)) {
-			case EXIT_SUCCESS:
-				printf("Deleted!\n");
-				break;
-			case EMPTY_LIST:
-				printf("List is empty!\n");
-				break;
-			case NO_PERSON_FOUND_INT:
-				printf("Can't find person with that surname!\n");
-				break;
-			default:
-				break;
-			}
-			continue;
-		case 'f':
-			person = findPerson(head->next);
-			person ? insertAfterPerson(person) : printf("Can't find person with that surname!\n");
-			continue;
-		case 'b':
-			previous = findPrevious(head);
-			previous ? insertAfterPerson(previous) : printf("Can't find person with that surname!\n");
-			continue;
-		case 'o':
-			switch (bubbleSort(head->next)) {
-			case EXIT_SUCCESS:
-				printf("Sorted!\n");
-				printList(head->next);
-				break;
-			case EMPTY_LIST:
-				printf("List is empty!\n");
-				break;
-			case SINGLE_PERSON_IN_LIST:
-				printf("Single person in list, no use sorting!\n");
-				break;
-			default:
-				break;
-			}
-			continue;
-		case 'w':
-			/*	person = findPerson(head->next);
-				person ? printPerson(person) : printf("Can't find person with that surname!\n");*/
-			continue;
-			// read items in list from the file
-		case 'R':
-		case 'r':
-			/*	person = findPerson(head->next);
-				person ? printPerson(person) : printf("Can't find person with that surname!\n");*/
-			continue;
-			// exit program
-		case 'x':
-			break;
-		default:
-			printf("Wrong letter!\n");
-			continue;
-		}
-		break;
-	}
-	return EXIT_SUCCESS;
-}

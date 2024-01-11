@@ -1,4 +1,4 @@
 ﻿  zad3.c
-c:\users\milic\desktop\strukture\zad3\zad3\zad3.c(192): warning C4477: 'scanf' : format string '%c' requires an argument of type 'char *', but variadic argument 1 has type 'int'
-c:\users\milic\desktop\strukture\zad3\zad3\zad3.c(125): warning C4172: returning address of local variable or temporary: surname
+c:\users\milic\desktop\strukture\zad3\zad3\zad3.c(232): warning C4047: 'return': 'int' differs in levels of indirection from 'void *'
+c:\users\milic\desktop\strukture\zad3\zad3\zad3.c(183): warning C4172: returning address of local variable or temporary: surname
   zad3.vcxproj -> C:\Users\Milic\Desktop\strukture\zad3\Debug\zad3.exe
