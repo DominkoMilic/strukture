@@ -1,7 +1,0 @@
-﻿  zad.c
-  zad2.cpp
-c:\users\milic\desktop\strukture\vjezbazaispit\vjezbazaispit\zad2.cpp(16): error C2059: syntax error: '.'
-c:\users\milic\desktop\strukture\vjezbazaispit\vjezbazaispit\zad2.cpp(16): error C2143: syntax error: missing ';' before '}'
-c:\users\milic\desktop\strukture\vjezbazaispit\vjezbazaispit\zad2.cpp(19): error C2059: syntax error: 'return'
-c:\users\milic\desktop\strukture\vjezbazaispit\vjezbazaispit\zad2.cpp(20): error C2059: syntax error: '}'
-c:\users\milic\desktop\strukture\vjezbazaispit\vjezbazaispit\zad2.cpp(20): error C2143: syntax error: missing ';' before '}'
