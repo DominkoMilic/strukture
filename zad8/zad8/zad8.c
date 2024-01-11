@@ -15,10 +15,14 @@ typedef struct _node {
 
 Position createNode(int value);
 Position insert(Position root, int value);
-int inorder(Position root);
-int preorder(Position root);
-int postorder(Position root);
+void inorder(Position root);
+void preorder(Position root);
+void postorder(Position root);
 int orderLevel(Position root);
+Position Delete(Position current, int x);
+Position FindBiggest(Position current);
+Position FindSmallest(Position current);
+Position Find(Position current, int x);
 
 int main() {
 	Position root = NULL;
@@ -48,6 +52,8 @@ int main() {
 	printf("level order: ");
 	orderLevel(root);
 	printf("\n");
+
+	Find(root, 7);
 
 
 	return EXIT_SUCCESS;
@@ -80,35 +86,32 @@ Position insert(Position root, int value) {
 	return root;
 }
 
-int inorder(Position root) {
-	if (root) {
-		inorder(root->left);
-		printf("%d ", root->value);
-		inorder(root->right);
-	}
-
-	return EXIT_SUCCESS;
+void inorder(Position root)
+{
+	if (root == NULL)
+		return;
+	inorder(root->left);
+	printf("%d ", root->value);
+	inorder(root->right);
 }
 
-int preorder(Position root) {
-	if (root) {
-		printf("%d ", root->value);
-		preorder(root->left);
-		preorder(root->right);
-	}
-
-	return EXIT_SUCCESS;
+void preorder(Position root)
+{
+	if (root == NULL)
+		return;
+	printf("%d ", root->value);
+	preorder(root->left);
+	preorder(root->right);
 }
 
 
-int postorder(Position root) {
-	if (root) {
-		postorder(root->left);
-		postorder(root->right);
-		printf("%d ", root->value);
-	}
-
-	return EXIT_SUCCESS;
+void postorder(Position root)
+{
+	if (root == NULL)
+		return;
+	postorder(root->left);
+	postorder(root->right);
+	printf("%d ", root->value);
 }
 
 int orderLevel(Position root) {
@@ -133,4 +136,56 @@ int orderLevel(Position root) {
 	}
 
 	return EXIT_SUCCESS;
+}
+
+Position Delete(Position current, int x)
+{
+	Position temp = NULL;
+	if (current == NULL)
+		printf("that element does not exist\n");
+	else if (x < current->value)
+		current->left = Delete(current->left, x);
+	else if (x > current->value)
+		current->right = Delete(current->right, x);
+	else if (current->left != NULL && current->right != NULL)
+	{
+		temp = FindSmallest(current->right);
+		current->value = temp->value;
+		current->right = Delete(current->right, current->value);
+	}
+	else
+	{
+		temp = current;
+		if (current->left == NULL)
+			current = current->right;
+		else
+			current = current->left;
+		free(temp);
+	}
+	return current;
+}
+
+Position FindSmallest(Position current)
+{
+	while (current->left != NULL)
+		current = current->left;
+	return current;
+}
+
+Position FindBiggest(Position current)
+{
+	while (current->right != NULL)
+		current = current->right;
+	return current;
+}
+
+Position Find(Position current, int x)
+{
+	if (current == NULL)
+		return NULL;
+	else if (x < current->value)
+		return Find(current->left, x);
+	else if (x > current->value)
+		return Find(current->right, x);
+	return current;
 }
