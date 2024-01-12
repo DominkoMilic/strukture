@@ -17,17 +17,17 @@ struct _stack;
 typedef struct _stack* PositionLevelStack;
 typedef struct _stack
 {
-	PositionDirectory el;
+	PositionDirectory element;
 	PositionLevelStack next;
 } stack;
 
-int Print(PositionLevelStack p);
-int md(char* ime, PositionDirectory p);
-PositionDirectory cd(char* ime, PositionDirectory p);
-int dir(PositionDirectory p);
-int pushStog(PositionDirectory p, PositionLevelStack s);
-PositionLevelStack popStog(PositionLevelStack p);
-int DeleteAll(PositionDirectory p);
+int Print(PositionLevelStack currentDirectory);
+int md(char* ime, PositionDirectory currentDirectory);
+PositionDirectory cd(char* ime, PositionDirectory currentDirectory);
+int dir(PositionDirectory currentDirectory);
+int pushStog(PositionDirectory currentDirectory, PositionLevelStack headLevelStack);
+PositionLevelStack popStog(PositionLevelStack headLevelStack);
+int DeleteAll(PositionDirectory currentDirectory);
 
 int main()
 {
@@ -46,7 +46,7 @@ int main()
 		perror("couldn't allocate memory\n");
 		return EXIT_FAILURE;
 	}
-	current->el = &head;
+	current->element = &head;
 	current->next = NULL;
 
 	while (1)
@@ -80,7 +80,7 @@ int main()
 			if (currentDir == &head)
 				continue;
 			swap = popStog(current);
-			currentDir = swap->el;
+			currentDir = swap->element;
 		}
 		else
 		{
@@ -93,125 +93,125 @@ int main()
 	return 0;
 }
 
-int Print(PositionLevelStack p)
+int Print(PositionLevelStack headLevelStack)
 {
-	while (p != NULL)
+	while (headLevelStack != NULL)
 	{
-		printf("%s:", p->el->name);
-		p = p->next;
+		printf("%s:", headLevelStack->element->name);
+		headLevelStack = headLevelStack->next;
 	}
 	return EXIT_SUCCESS;
 }
 
-int md(char* ime, PositionDirectory p)
+int md(char* ime, PositionDirectory currentDirectory)
 {
-	PositionDirectory q = NULL;
-	q = (PositionDirectory)malloc(sizeof(directory));
-	if (q == NULL)
+	PositionDirectory newElement = NULL;
+	newElement = (PositionDirectory)malloc(sizeof(directory));
+	if (newElement == NULL)
 	{
 		perror("couldn't allocate memory\n");
 		return EXIT_FAILURE;
 	}
-	strcpy(q->name, ime);
-	q->child = NULL;
-	q->sibling = NULL;
+	strcpy(newElement->name, ime);
+	newElement->child = NULL;
+	newElement->sibling = NULL;
 
-	if (p->child == NULL)
+	if (currentDirectory->child == NULL)
 	{
-		p->child = q;
+		currentDirectory->child = newElement;
 		return EXIT_SUCCESS;
 	}
 
-	p = p->child;
-	while (p != NULL)
+	currentDirectory = currentDirectory->child;
+	while (currentDirectory != NULL)
 	{
-		if (strcmp(ime, p->name) == 0)
+		if (strcmp(ime, currentDirectory->name) == 0)
 		{
 			printf("directory with that name already exist\n");
 			return EXIT_SUCCESS;
 		}
-		if (p->sibling == NULL)
+		if (currentDirectory->sibling == NULL)
 		{
-			p->sibling = q;
+			currentDirectory->sibling = newElement;
 			break;
 		}
-		p = p->sibling;
+		currentDirectory = currentDirectory->sibling;
 	}
 	return EXIT_SUCCESS;
 }
 
-PositionDirectory cd(char* ime, PositionDirectory p)
+PositionDirectory cd(char* ime, PositionDirectory currentDirectory)
 {
-	PositionDirectory q = p;
-	p = p->child;
-	while (p != NULL)
+	PositionDirectory temp = currentDirectory;
+	currentDirectory = currentDirectory->child;
+	while (currentDirectory != NULL)
 	{
-		if (strcmp(p->name, ime) == 0)
-			return p;
-		p = p->sibling;
+		if (strcmp(currentDirectory->name, ime) == 0)
+			return currentDirectory;
+		currentDirectory = currentDirectory->sibling;
 	}
-	if (p == NULL)
+	if (currentDirectory == NULL)
 	{
 		printf("that directory doesn't exist\n");
-		return q;
+		return temp;
 	}
 }
 
-int dir(PositionDirectory p)
+int dir(PositionDirectory currentDirectory)
 {
-	p = p->child;
-	if (p == NULL)
+	currentDirectory = currentDirectory->child;
+	if (currentDirectory == NULL)
 	{
 		printf("there is no any directory\n");
 		return EXIT_SUCCESS;
 	}
-	while (p != NULL)
+	while (currentDirectory != NULL)
 	{
-		printf("\t%s\n", p->name);
-		p = p->sibling;
+		printf("\t%s\n", currentDirectory->name);
+		currentDirectory = currentDirectory->sibling;
 	}
 	return EXIT_SUCCESS;
 }
 
-int pushStog(PositionDirectory p, PositionLevelStack s)
+int pushStog(PositionDirectory currentDirectory, PositionLevelStack headLevelStack)
 {
-	PositionLevelStack q = NULL;
-	q = (PositionLevelStack)malloc(sizeof(stack));
-	if (q == NULL)
+	PositionLevelStack newElement = NULL;
+	newElement = (PositionLevelStack)malloc(sizeof(stack));
+	if (newElement == NULL)
 	{
 		perror("couldn't allocate memory\n");
 		return EXIT_FAILURE;
 	}
-	q->el = p;
+	newElement->element = currentDirectory;
 
-	while (s->next != NULL)
-		s = s->next;
-	q->next = s->next;
-	s->next = q;
+	while (headLevelStack->next != NULL)
+		headLevelStack = headLevelStack->next;
+	newElement->next = headLevelStack->next;
+	headLevelStack->next = newElement;
 	return EXIT_SUCCESS;
 }
 
-PositionLevelStack popStog(PositionLevelStack p)
+PositionLevelStack popStog(PositionLevelStack currentDirectory)
 {
-	PositionLevelStack prev = p;
-	PositionLevelStack t = NULL;
-	while (p->next != NULL)
+	PositionLevelStack prev = currentDirectory;
+	PositionLevelStack temp = NULL;
+	while (currentDirectory->next != NULL)
 	{
-		prev = p;
-		p = p->next;
+		prev = currentDirectory;
+		currentDirectory = currentDirectory->next;
 	}
-	t = p;
+	temp = currentDirectory;
 	prev->next = NULL;
-	free(t);
+	free(temp);
 	return prev;
 }
 
-int DeleteAll(PositionDirectory p)
+int DeleteAll(PositionDirectory currentDirectory)
 {
-	if (p == NULL)
+	if (currentDirectory == NULL)
 		return EXIT_SUCCESS;
-	DeleteAll(p->sibling);
-	DeleteAll(p->child);
-	free(p);
+	DeleteAll(currentDirectory->sibling);
+	DeleteAll(currentDirectory->child);
+	free(currentDirectory);
 	return EXIT_SUCCESS;
 }
