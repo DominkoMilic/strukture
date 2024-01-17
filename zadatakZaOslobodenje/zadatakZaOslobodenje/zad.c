@@ -47,6 +47,8 @@ int ReadingUsers(char* fileName, bookPosition bookHead, char* title);
 int CheckingUserNumberOfCertainBook(bookPosition bookHead, char* title, char* userName);
 int BookReturn(bookPosition bookHead, char* userName, char* title, int returnNumber);
 int FreeMemory(userPosition currentUser, userPosition previousUser);
+void ChangingUserNumberOfBooks(bookPosition bookHead, char* userName);
+int UsersAndTheirBooksPrint(bookPosition bookHead);
 
 int main() {
 
@@ -80,7 +82,7 @@ void Menu(bookPosition bookHead, char* fileName) {
 			break;
 		}
 		case 'b': {
-
+			UsersAndTheirBooksPrint(bookHead);
 			break;
 		}
 		case 'c': {
@@ -149,13 +151,15 @@ void Menu(bookPosition bookHead, char* fileName) {
 				scanf(" %s", answer);
 				if (strcmp(answer, "yes") == 0)
 				{
-					InsertUserToBook(bookHead, name, title, currentlyAvailable);
+					for(int i = 0; i < currentlyAvailable; i++)
+						InsertUserToBook(bookHead, name, title, currentlyAvailable);
 					break;
 				}
 				else
 					break;
 			}
-			InsertUserToBook(bookHead, name, title, loanNumber);
+			for(int i = 0; i < loanNumber; i++)
+				InsertUserToBook(bookHead, name, title, 1);
 			break;
 		}
 		case 'g': {
@@ -182,10 +186,11 @@ void Menu(bookPosition bookHead, char* fileName) {
 			scanf("%d", &returnNumber);
 			int numberOfUserCertainBook = CheckingUserNumberOfCertainBook(bookHead, title, name);
 			if (returnNumber > numberOfUserCertainBook) {
-				printf("Sorry, but user %s don't have %d books titled %s\n", name, returnNumber, title);
+				printf("Sorry, but user %s don't have enough books titled %s\n", name, returnNumber, title);
 			}
 			else {
-				BookReturn(bookHead, name, title, returnNumber);
+				for(int i = 0; i < returnNumber; i++)
+					BookReturn(bookHead, name, title, 1);
 			}
 
 			break;
@@ -518,7 +523,6 @@ int ReadingUsers(char* fileName, bookPosition bookHead, char* title) {
 		fscanf(filePointerUsers, "%s %s %d\n", userName, userSurname, &numberOfBooks);
 		strcat(userName, " ");
 		strcat(userName, userSurname);
-		//AllUsersSorted(bookHead, userName, numberOfBooks);
 		for (int i = 0; i < numberOfBooks; i++) {
 			InsertUserToBook(bookHead, userName, title, 1);
 		}
@@ -530,16 +534,18 @@ int ReadingUsers(char* fileName, bookPosition bookHead, char* title) {
 int CheckingUserNumberOfCertainBook(bookPosition bookHead, char* title, char* userName) {
 	bookPosition currentBook = bookHead->next;
 	userPosition currentUser = currentBook->userHead;
+	int counter = 0;
 	while (currentBook != NULL) {
+		counter = 0;
 		if (strcmp(currentBook->title, title) == 0) {
 			currentUser = currentBook->userHead;
 			while (currentUser != NULL) {
-				printf("%s = %s\n", currentUser->name, userName);
 				if (strcmp(currentUser->name, userName) == 0) {
-					return currentUser->booksNumber;
+					counter++;
 				}
 				currentUser = currentUser->next;
 			}
+			return counter;
 		}
 		currentBook = currentBook->next;
 	}
@@ -549,19 +555,28 @@ int CheckingUserNumberOfCertainBook(bookPosition bookHead, char* title, char* us
 int BookReturn(bookPosition bookHead, char* userName, char* title, int returnNumber) {
 	bookPosition currentBook = bookHead->next;
 	userPosition currentUser = currentBook->userHead;
-	userPosition previousUser = bookHead->userHead;
+	userPosition previousUser = NULL;
 	while (currentBook != NULL) {
 		if (strcmp(currentBook->title, title) == 0) {
+			currentUser = currentBook->userHead;
 			while (currentUser != NULL) {
-				printf("%s = %s\n", currentUser->name, userName);
-				currentUser = currentBook->userHead;
-				previousUser = bookHead->userHead;//nesto lose triba se minjat bookHead
 				if (strcmp(currentUser->name, userName) == 0) {
-					currentUser->booksNumber = currentUser->booksNumber - returnNumber;
-					FreeMemory(currentUser, previousUser);
+					if (previousUser == NULL) {
+						currentBook->userHead = currentUser->next;
+						ChangingUserNumberOfBooks(bookHead, userName);
+						currentBook->available++;
+						free(currentUser);
+						return EXIT_SUCCESS;
+					}
+					else {
+						ChangingUserNumberOfBooks(bookHead, userName);
+						currentBook->available++;
+						FreeMemory(currentUser, previousUser);
+						return EXIT_SUCCESS;
+					}
 				}
 				previousUser = currentUser;
-				currentUser = currentUser->next;
+				currentUser = previousUser->next;
 			}
 		}
 		currentBook = currentBook->next;
@@ -572,7 +587,39 @@ int BookReturn(bookPosition bookHead, char* userName, char* title, int returnNum
 
 int FreeMemory(userPosition currentUser, userPosition previousUser) {
 	previousUser->next = currentUser->next;
-	printf("oslobadanje");
 	free(currentUser);
 	return EXIT_SUCCESS;
 }
+
+void ChangingUserNumberOfBooks(bookPosition bookHead, char* userName) {
+	userPosition currentUser = bookHead->userHead;
+	while (currentUser != NULL) {
+		if (strcmp(userName, currentUser->name) == 0)
+			currentUser->booksNumber--;
+		currentUser = currentUser->next;
+	}
+}
+
+int UsersAndTheirBooksPrint(bookPosition bookHead) {
+	userPosition currentUser = bookHead->userHead;
+	bookPosition currentBook = bookHead->next;
+	int flag = 0;
+	while (currentUser != NULL) {
+		currentBook = bookHead->next;
+		printf("%s:\n", currentUser->name);
+		while (currentBook != NULL) {
+			flag = 0;
+			flag = CheckingUserNumberOfCertainBook(bookHead, currentBook->title, currentUser->name);
+			if (flag > 0) {
+				for (int i = 0; i < flag; i++)
+					printf("%s\n", currentBook->title);
+			}
+			currentBook = currentBook->next;
+		}
+		printf("\n");
+		currentUser = currentUser->next;
+	}
+
+	return EXIT_SUCCESS;
+}
+
