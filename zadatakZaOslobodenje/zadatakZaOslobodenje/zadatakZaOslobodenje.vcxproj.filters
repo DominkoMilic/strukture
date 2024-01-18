@@ -44,5 +44,8 @@
     <Text Include="ID0908.txt">
       <Filter>Source Files</Filter>
     </Text>
+    <Text Include="ID1234.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

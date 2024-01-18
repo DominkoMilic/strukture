@@ -1,2 +1,3 @@
 ﻿  zad.c
+C:\Users\Administrator\Desktop\strukture\zadatakZaOslobodenje\zadatakZaOslobodenje\zad.c(72,2): warning C4013: 'AddingUsersWithZeroBooks' undefined; assuming extern returning int
   zadatakZaOslobodenje.vcxproj -> C:\Users\Administrator\Desktop\strukture\zadatakZaOslobodenje\Debug\zadatakZaOslobodenje.exe

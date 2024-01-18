@@ -127,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ID0908.txt" />
+    <Text Include="ID1234.txt" />
     <Text Include="ID1402.txt" />
     <Text Include="ID1456.txt" />
     <Text Include="ID1938.txt" />

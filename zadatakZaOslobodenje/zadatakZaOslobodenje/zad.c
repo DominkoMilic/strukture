@@ -52,6 +52,7 @@ int FreeMemory(userPosition currentUser, userPosition previousUser);
 void ChangingUserNumberOfBooks(bookPosition bookHead, char* userName);
 int UsersAndTheirBooksPrint(bookPosition bookHead);
 int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookHead);
+int AllUserWriteToFile(char* fileName, bookPosition bookHead);
 int NumberOfLoanedBooks(bookPosition currentBook);
 
 int main() {
@@ -68,7 +69,8 @@ int main() {
 
 	char* fileName = "library.txt";
 	ReadFromFile(fileName, &bookHead);
-	
+	AddingUsersWithZeroBooks(&bookHead, "ID1234.txt");
+	AllUserWriteToFile("ID1234.txt", &bookHead);
 
 	Menu(&bookHead, fileName);
 
@@ -128,7 +130,7 @@ void Menu(bookPosition bookHead, char* fileName) {
 				break;
 			}
 			if (CheckingUserNumberOfBook(bookHead, name) == 5) {
-				printf("Sorry, but you cannot loan more than 5 books at the same time\n");
+				printf("Sorry, but you already have 5 books\n");
 				break;
 			}
 			printf("Enter the name of the book you want to loan: \n");
@@ -147,6 +149,10 @@ void Menu(bookPosition bookHead, char* fileName) {
 			int currentlyAvailable = CheckingAvailableNumberOfBook(bookHead, title);
 			if (currentUserNumberOfBooks + loanNumber > 5) {
 				printf("Sorry, but you cannot loan more than 5 books, you can loan %d more books\n", 5 - currentUserNumberOfBooks);
+				break;
+			}
+			else if (currentlyAvailable == 0) {
+				printf("sorry, but we don't have any %s left\n", title);
 				break;
 			}
 			else if (currentlyAvailable < loanNumber) {
@@ -202,11 +208,15 @@ void Menu(bookPosition bookHead, char* fileName) {
 		case 'h': {
 			printf("saving to file library.txt...\n");
 			WriteToFile(fileName, bookHead);
+			AllUserWriteToFile("ID1234.txt", bookHead);
 			break;
 		}
 		case 'x': {
 			printf("exiting...");
 			return;
+		}
+		default: {
+			printf("Invalid choice\n");
 		}
 	}
 	Menu(bookHead, fileName);
@@ -224,7 +234,7 @@ int ReadFromFile(char* fileName, bookPosition bookHead) {
 	int available = 0;
 	char bookID[MAX_LENGTH] = { 0 }, IDFile[MAX_LENGTH] = { 0 };
 	bookPosition currentBook = bookHead;
-
+	fscanf(filePointer, "ALL USERS: ID1234\n");
 	while (fscanf(filePointer, "TITLE: %1023[^\n]\n", title) == 1) {
 		fscanf(filePointer, "AUTHOR: %1023[^\n]\n", author);
 		fscanf(filePointer, "RELEASE YEAR: %d\n", &releaseYear);
@@ -256,6 +266,28 @@ int ReadingUsers(char* fileName, bookPosition bookHead, char* title) {
 		strcat(userName, userSurname);
 		for (int i = 0; i < numberOfBooks; i++) {
 			InsertUserToBook(bookHead, userName, title, 1);
+		}
+	}
+	fclose(filePointerUsers);
+	return EXIT_SUCCESS;
+}
+
+int ReadingAllUsers(char* fileName, bookPosition bookHead) {
+	char userName[MAX_LENGTH] = { 0 };
+	char userSurname[MAX_LENGTH] = { 0 };
+	int numberOfBooks = 0;
+	FILE* filePointerUsers = NULL;
+	filePointerUsers = fopen(fileName, "r");
+	if (filePointerUsers == NULL) {
+		printf("Error opening %s file", fileName);
+		return EXIT_FAILURE;
+	}
+	while (!feof(filePointerUsers)) {
+		fscanf(filePointerUsers, "%s %s %d\n", userName, userSurname, &numberOfBooks);
+		strcat(userName, " ");
+		strcat(userName, userSurname);
+		for (int i = 0; i < numberOfBooks; i++) {
+			AllUsersSorted(bookHead, userName, numberOfBooks);
 		}
 	}
 	fclose(filePointerUsers);
@@ -536,6 +568,23 @@ int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookH
 	return EXIT_SUCCESS;
 }
 
+int AllUserWriteToFile(char* fileName, bookPosition bookHead) {
+	FILE* filePointer = NULL;
+	int userNumberOfBook = 0;
+	filePointer = fopen(fileName, "w");
+	if (filePointer == NULL) {
+		perror("Error opening file");
+		return EXIT_FAILURE;
+	}
+	userPosition currentUser = bookHead->userHead;
+	while (currentUser != NULL) {
+		fprintf(filePointer, "%s %d\n", currentUser->name, currentUser->booksNumber);
+		currentUser = currentUser->next;
+	}
+	fclose(filePointer);
+	return EXIT_SUCCESS;
+}
+
 int WriteToFile(char* fileName, bookPosition bookHead) {
 	FILE* filePointer = NULL;
 	filePointer = fopen(fileName, "w");
@@ -546,6 +595,7 @@ int WriteToFile(char* fileName, bookPosition bookHead) {
 	bookPosition currentBook = bookHead->next;
 	char completeID[ID_LENGTH] = {0};
 	int insertAvailable = 0;
+	fprintf(filePointer, "ALL USERS: ID1234\n\n");
 	while (currentBook != NULL) {
 		fprintf(filePointer, "TITLE: %s\n", currentBook->title);
 		fprintf(filePointer, "AUTHOR: %s\n", currentBook->author);
@@ -665,4 +715,26 @@ int NumberOfLoanedBooks(bookPosition currentBook) {
 		currentUser = currentUser->next;
 	}
 	return counter;
+}
+
+int AddingUsersWithZeroBooks(bookPosition bookHead, char* fileName) {
+	FILE* filePointer = NULL;
+	filePointer = fopen(fileName, "r");
+	if (!filePointer) {
+		perror("couldn't open file");
+		return EXIT_FAILURE;
+	}
+	char name[MAX_LENGTH] = { 0 };
+	char surname[MAX_LENGTH] = { 0 };
+	int temp = 0;
+	while (!feof(filePointer)) {
+		fscanf(filePointer, "%s %s %d\n", name, surname, &temp);
+		if (temp == 0) {
+			strcat(name, " ");
+			strcat(name, surname);
+			AllUsersSorted(bookHead, name, 0);
+		}
+	}
+
+	return EXIT_FAILURE;
 }
