@@ -200,12 +200,12 @@ void Menu(bookPosition bookHead, char* fileName) {
 			break;
 		}
 		case 'h': {
-			printf("Saving to file ""library.txt");
+			printf("saving to file library.txt...\n");
 			WriteToFile(fileName, bookHead);
 			break;
 		}
 		case 'x': {
-			printf("exiting");
+			printf("exiting...");
 			return;
 		}
 	}
