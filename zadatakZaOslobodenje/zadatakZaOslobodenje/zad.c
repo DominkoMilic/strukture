@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #define MAX_LENGTH (1024)
+#define ID_LENGTH (15)
 
 
 struct User;
@@ -21,14 +22,15 @@ typedef struct Book* bookPosition;
 typedef struct Book {
 	char title[MAX_LENGTH];
 	char author[MAX_LENGTH];
+	char ID[ID_LENGTH];
 	int releaseYear;
 	int available;
 	bookPosition next;
 	userPosition userHead;
 } book;
 
-bookPosition CreateNewBook(char* title, char* author, int releaseYear, int available);
-void AllBooksSorted(bookPosition bookHead, char* title, char* author, int releaseYear, int available);
+bookPosition CreateNewBook(char* title, char* author, int releaseYear, int available, char* bookID);
+void AllBooksSorted(bookPosition bookHead, char* title, char* author, int releaseYear, int available, char* bookID);
 void ListPrint(bookPosition bookHead);
 void Menu(bookPosition bookHead, char* fileName);
 void SearchByYear(bookPosition bookHead, int searchYear);
@@ -49,6 +51,8 @@ int BookReturn(bookPosition bookHead, char* userName, char* title, int returnNum
 int FreeMemory(userPosition currentUser, userPosition previousUser);
 void ChangingUserNumberOfBooks(bookPosition bookHead, char* userName);
 int UsersAndTheirBooksPrint(bookPosition bookHead);
+int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookHead);
+int NumberOfLoanedBooks(bookPosition currentBook);
 
 int main() {
 
@@ -185,8 +189,8 @@ void Menu(bookPosition bookHead, char* fileName) {
 			int returnNumber = 0;
 			scanf("%d", &returnNumber);
 			int numberOfUserCertainBook = CheckingUserNumberOfCertainBook(bookHead, title, name);
-			if (returnNumber > numberOfUserCertainBook) {
-				printf("Sorry, but user %s don't have enough books titled %s\n", name, returnNumber, title);
+			if (returnNumber > numberOfUserCertainBook || numberOfUserCertainBook == 0) {
+				printf("Sorry, but user %s don't have enough books titled %s\n", name, title);
 			}
 			else {
 				for(int i = 0; i < returnNumber; i++)
@@ -208,6 +212,56 @@ void Menu(bookPosition bookHead, char* fileName) {
 	Menu(bookHead, fileName);
 }
 
+int ReadFromFile(char* fileName, bookPosition bookHead) {
+	FILE* filePointer = NULL;
+	filePointer = fopen(fileName, "r");
+	if (filePointer == NULL) {
+		perror("Error opening file");
+		return EXIT_FAILURE;
+	}
+	char author[MAX_LENGTH] = { 0 }, title[MAX_LENGTH] = { 0 };
+	int releaseYear = 0;
+	int available = 0;
+	char bookID[MAX_LENGTH] = { 0 }, IDFile[MAX_LENGTH] = { 0 };
+	bookPosition currentBook = bookHead;
+
+	while (fscanf(filePointer, "TITLE: %1023[^\n]\n", title) == 1) {
+		fscanf(filePointer, "AUTHOR: %1023[^\n]\n", author);
+		fscanf(filePointer, "RELEASE YEAR: %d\n", &releaseYear);
+		fscanf(filePointer, "AVAILABLE: %d\n", &available);
+		fscanf(filePointer, "USERS: %1023[^\n]\n", bookID);
+		strcpy(IDFile, bookID);
+		strcat(IDFile, ".txt");
+		AllBooksSorted(bookHead, title, author, releaseYear, available, bookID);
+		ReadingUsers(IDFile, bookHead, title);
+	}
+
+	fclose(filePointer);
+	return EXIT_SUCCESS;
+}
+
+int ReadingUsers(char* fileName, bookPosition bookHead, char* title) {
+	char userName[MAX_LENGTH] = { 0 };
+	char userSurname[MAX_LENGTH] = { 0 };
+	int numberOfBooks = 0;
+	FILE* filePointerUsers = NULL;
+	filePointerUsers = fopen(fileName, "r");
+	if (filePointerUsers == NULL) {
+		printf("Error opening %s file", fileName);
+		return EXIT_FAILURE;
+	}
+	while (!feof(filePointerUsers)) {
+		fscanf(filePointerUsers, "%s %s %d\n", userName, userSurname, &numberOfBooks);
+		strcat(userName, " ");
+		strcat(userName, userSurname);
+		for (int i = 0; i < numberOfBooks; i++) {
+			InsertUserToBook(bookHead, userName, title, 1);
+		}
+	}
+	fclose(filePointerUsers);
+	return EXIT_SUCCESS;
+}
+
 userPosition CreateNewUser(char* name, int numberOfBooks) {
 	userPosition newUser = NULL;
 	newUser = (userPosition)malloc(sizeof(user));
@@ -223,7 +277,7 @@ userPosition CreateNewUser(char* name, int numberOfBooks) {
 	return newUser;
 }
 
-bookPosition CreateNewBook(char* title, char* author, int releaseYear, int available) {
+bookPosition CreateNewBook(char* title, char* author, int releaseYear, int available, char* bookID) {
 	bookPosition newElement = NULL;
 	newElement = (bookPosition)malloc(sizeof(book));
 	if (!newElement) {
@@ -233,6 +287,7 @@ bookPosition CreateNewBook(char* title, char* author, int releaseYear, int avail
 
 	strcpy(newElement->title, title);
 	strcpy(newElement->author, author);
+	strcpy(newElement->ID, bookID);
 	newElement->releaseYear = releaseYear;
 	newElement->available = available;
 	newElement->userHead = NULL;
@@ -244,11 +299,6 @@ bookPosition CreateNewBook(char* title, char* author, int releaseYear, int avail
 
 int AllUsersSorted(bookPosition bookHead, char* name, int numberOfBooks) {
 	userPosition newElement = CreateNewUser(name, numberOfBooks);
-
-	if (!newElement) {
-		printf("couldn't allocate memory");
-		return EXIT_FAILURE;
-	}
 
 	userPosition current = bookHead->userHead;
 	userPosition prev = NULL;
@@ -286,8 +336,8 @@ int AllUsersSorted(bookPosition bookHead, char* name, int numberOfBooks) {
 	return EXIT_SUCCESS;
 }
 
-void AllBooksSorted(bookPosition bookHead, char* title, char* author, int releaseYear, int available) {
-	bookPosition newElement = CreateNewBook(title, author, releaseYear, available);
+void AllBooksSorted(bookPosition bookHead, char* title, char* author, int releaseYear, int available, char* bookID) {
+	bookPosition newElement = CreateNewBook(title, author, releaseYear, available, bookID);
 	bookPosition current = bookHead;
 	bookPosition previous = NULL;
 
@@ -343,7 +393,7 @@ void ListPrint(bookPosition bookHead) {
 		currentBook = currentBook->next;
 	}
 
-	PrintUsers(bookHead);
+	//PrintUsers(bookHead);
 }
 
 
@@ -382,36 +432,6 @@ void SearchByAuthor(bookPosition bookHead, char* author) {
 		printf("Sorry, we don't have any book from that author\n");
 }
 
-
-int ReadFromFile(char* fileName, bookPosition bookHead) {
-	FILE* filePointer = NULL;
-	filePointer = fopen(fileName, "r");
-	if (filePointer == NULL) {
-		perror("Error opening file");
-		return EXIT_FAILURE;
-	}
-	char author[MAX_LENGTH] = { 0 }, title[MAX_LENGTH] = { 0 };
-	int releaseYear = 0;
-	int available = 0;
-	char bookID[MAX_LENGTH] = { 0 }, IDFile[MAX_LENGTH] = { 0 };
-	bookPosition currentBook = bookHead;
-
-	while (fscanf(filePointer, "TITLE: %1023[^\n]\n", title) == 1) {
-		fscanf(filePointer, "AUTHOR: %1023[^\n]\n", author);
-		fscanf(filePointer, "RELEASE YEAR: %d\n", &releaseYear);
-		fscanf(filePointer, "AVAILABLE: %d\n", &available);
-		fscanf(filePointer, "USERS: %1023[^\n]\n", bookID);
-		strcpy(IDFile, bookID);
-		strcat(IDFile, ".txt");
-		AllBooksSorted(bookHead, title, author, releaseYear, available);
-		ReadingUsers(IDFile, bookHead, title);
-	}
-
-	fclose(filePointer);
-	return EXIT_SUCCESS;
-}
-
-
 void InsertUserToBook(bookPosition bookHead, char* userName, char* title, int numberOfBooks) {
 	AllUsersSorted(bookHead, userName, numberOfBooks);
 	int newNumberOfBooks = numberOfBooks + CheckingUserNumberOfBook(bookHead, userName);
@@ -434,7 +454,6 @@ void InsertUserToBook(bookPosition bookHead, char* userName, char* title, int nu
 	}
 
 }
-
 
 bool CheckIfUserExist(bookPosition bookHead, char* name) {
 	userPosition first = bookHead->userHead;
@@ -467,7 +486,7 @@ int CheckingUserNumberOfBook(bookPosition bookHead, char* name) {
 		current = current->next;
 	}
 
-	return -1;
+	return 0;
 }
 
 int CheckingAvailableNumberOfBook(bookPosition bookHead, char* title) {
@@ -479,7 +498,42 @@ int CheckingAvailableNumberOfBook(bookPosition bookHead, char* title) {
 		current = current->next;
 	}
 
-	return -1;
+	return 0;
+}
+
+int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookHead) {
+	FILE* filePointer = NULL;
+	int userNumberOfBook = 0;
+	filePointer = fopen(fileName, "w");
+	if (filePointer == NULL) {
+		perror("Error opening file");
+		return EXIT_FAILURE;
+	}
+	if (currentBook->userHead == NULL) {
+		return EXIT_SUCCESS;
+	}
+	else if (currentBook->userHead->next == NULL) {
+		userNumberOfBook = CheckingUserNumberOfCertainBook(bookHead, currentBook->title, currentBook->userHead->name);
+		fprintf(filePointer, "%s %d\n", currentBook->userHead->name, currentBook->userHead->booksNumber);
+	}
+	userPosition currentUser = currentBook->userHead->next;
+	userPosition previousUser = currentBook->userHead;
+	while (previousUser != NULL) {
+		if (strcmp(currentUser->name, previousUser->name) == 0 && currentUser != previousUser) {
+			if(currentUser->next != NULL)
+				currentUser = currentUser->next;
+			previousUser = previousUser->next;
+		}
+		else {
+			userNumberOfBook = CheckingUserNumberOfCertainBook(bookHead, currentBook->title, previousUser->name);
+			fprintf(filePointer, "%s %d\n", previousUser->name, userNumberOfBook);
+			if(currentUser->next != NULL)
+				currentUser = currentUser->next;
+			previousUser = previousUser->next;
+		}
+	}
+	fclose(filePointer);
+	return EXIT_SUCCESS;
 }
 
 int WriteToFile(char* fileName, bookPosition bookHead) {
@@ -490,46 +544,26 @@ int WriteToFile(char* fileName, bookPosition bookHead) {
 		return EXIT_FAILURE;
 	}
 	bookPosition currentBook = bookHead->next;
-	userPosition currentUser = NULL;
+	char completeID[ID_LENGTH] = {0};
+	int insertAvailable = 0;
 	while (currentBook != NULL) {
 		fprintf(filePointer, "TITLE: %s\n", currentBook->title);
 		fprintf(filePointer, "AUTHOR: %s\n", currentBook->author);
 		fprintf(filePointer, "RELEASE YEAR: %d\n", currentBook->releaseYear);
-		fprintf(filePointer, "AVAILABLE: %d\n", currentBook->available);
-		fprintf(filePointer, "USERS: ");
-		currentUser = bookHead->userHead;
-		while (currentUser != NULL) {
-			fprintf(filePointer, "%s\n", currentUser->name);
-			currentUser = currentUser->next;
-		}
+		insertAvailable = currentBook->available + NumberOfLoanedBooks(currentBook);
+		fprintf(filePointer, "AVAILABLE: %d\n", insertAvailable);
+		fprintf(filePointer, "USERS: %s\n", currentBook->ID);
+		strcpy(completeID, currentBook->ID);
+		strcat(completeID, ".txt");
+		UserWriteToFile(completeID, currentBook, bookHead);
 		fprintf(filePointer, "\n");
+		currentBook = currentBook->next;
 	}
 
 	fclose(filePointer);
 	return EXIT_SUCCESS;
 }
 
-int ReadingUsers(char* fileName, bookPosition bookHead, char* title) {
-	char userName[MAX_LENGTH] = { 0 };
-	char userSurname[MAX_LENGTH] = { 0 };
-	int numberOfBooks = 0;
-	FILE* filePointerUsers = NULL;
-	filePointerUsers = fopen(fileName, "r");
-	if (filePointerUsers == NULL) {
-		printf("Error opening %s file", fileName);
-		return EXIT_FAILURE;
-	}
-	while (!feof(filePointerUsers)) {
-		fscanf(filePointerUsers, "%s %s %d\n", userName, userSurname, &numberOfBooks);
-		strcat(userName, " ");
-		strcat(userName, userSurname);
-		for (int i = 0; i < numberOfBooks; i++) {
-			InsertUserToBook(bookHead, userName, title, 1);
-		}
-	}
-	fclose(filePointerUsers);
-	return EXIT_SUCCESS;
-}
 
 int CheckingUserNumberOfCertainBook(bookPosition bookHead, char* title, char* userName) {
 	bookPosition currentBook = bookHead->next;
@@ -549,7 +583,7 @@ int CheckingUserNumberOfCertainBook(bookPosition bookHead, char* title, char* us
 		}
 		currentBook = currentBook->next;
 	}
-	return -1;
+	return 0;
 }
 
 int BookReturn(bookPosition bookHead, char* userName, char* title, int returnNumber) {
@@ -623,3 +657,12 @@ int UsersAndTheirBooksPrint(bookPosition bookHead) {
 	return EXIT_SUCCESS;
 }
 
+int NumberOfLoanedBooks(bookPosition currentBook) {
+	userPosition currentUser = currentBook->userHead;
+	int counter = 0;
+	while (currentUser != NULL) {
+		counter++;
+		currentUser = currentUser->next;
+	}
+	return counter;
+}
