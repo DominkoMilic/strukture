@@ -15,7 +15,7 @@ USERS: ID1402
 TITLE: The Hobbit
 AUTHOR: John Ronald Reuel Tolkien
 RELEASE YEAR: 1973
-AVAILABLE: 14
+AVAILABLE: 16
 USERS: ID0908
 
 TITLE: The Kingdom at the End of the Road
@@ -33,7 +33,7 @@ USERS: ID1456
 TITLE: The Last of the Mohicans
 AUTHOR: James Fenimore Cooper
 RELEASE YEAR: 1826
-AVAILABLE: 8
+AVAILABLE: 10
 USERS: ID9364
 
 TITLE: The Three Musketeers

@@ -65,7 +65,7 @@ int main() {
 		 .next = NULL,
 		 .userHead = NULL,
 	};
-	
+
 
 	char* fileName = "library.txt";
 	ReadFromFile(fileName, &bookHead);
@@ -83,141 +83,141 @@ void Menu(bookPosition bookHead, char* fileName) {
 	scanf(" %c", &choice);
 	switch (choice)
 	{
-		case 'a': {
-			ListPrint(bookHead);
+	case 'a': {
+		ListPrint(bookHead);
+		break;
+	}
+	case 'b': {
+		UsersAndTheirBooksPrint(bookHead);
+		break;
+	}
+	case 'c': {
+		int searchYear = 0;
+		printf("Enter year: \n");
+		scanf("%d", &searchYear);
+		SearchByYear(bookHead, searchYear);
+		break;
+	}
+	case 'd': {
+		char author[MAX_LENGTH] = { 0 };
+		printf("Enter author: \n");
+		scanf(" ");
+		fgets(author, sizeof(author), stdin);
+		author[strcspn(author, "\n")] = '\0'; //removing new line from author
+		SearchByAuthor(bookHead, author);
+		break;
+	}
+	case 'e': {
+		char name[MAX_LENGTH] = { 0 };
+		printf("Enter new user: \n");
+		scanf(" ");
+		fgets(name, sizeof(name), stdin);
+		name[strcspn(name, "\n")] = '\0'; //removing new line from name
+		if (CheckIfUserExist(bookHead, name) == true)
+			printf("%s is already a user\n", name);
+		else
+			AllUsersSorted(bookHead, name, 0);
+		break;
+	}
+	case 'f': {
+		char name[MAX_LENGTH] = { 0 };
+		printf("Enter users name: \n");
+		scanf(" ");
+		fgets(name, sizeof(name), stdin);
+		name[strcspn(name, "\n")] = '\0'; //removing new line from name
+		if (CheckIfUserExist(bookHead, name) == false) {
+			printf("Sorry, but that person is not one of our users\n");
 			break;
 		}
-		case 'b': {
-			UsersAndTheirBooksPrint(bookHead);
+		if (CheckingUserNumberOfBook(bookHead, name) == 5) {
+			printf("Sorry, but you already have 5 books\n");
 			break;
 		}
-		case 'c': {
-			int searchYear = 0;
-			printf("Enter year: \n");
-			scanf("%d", &searchYear);
-			SearchByYear(bookHead, searchYear);
+		printf("Enter the name of the book you want to loan: \n");
+		char title[MAX_LENGTH] = { 0 };
+		scanf(" ");
+		fgets(title, sizeof(title), stdin);
+		title[strcspn(title, "\n")] = '\0'; //removing new line from name
+		if (CheckIfBookExist(bookHead, title) == false) {
+			printf("Sorry, but we don't have that book\n");
 			break;
 		}
-		case 'd': {
-			char author[MAX_LENGTH] = { 0 };
-			printf("Enter author: \n");
-			scanf(" ");
-			fgets(author, sizeof(author), stdin);
-			author[strcspn(author, "\n")] = '\0'; //removing new line from author
-			SearchByAuthor(bookHead, author);
+		printf("Enter the number of books you want to loan: \n");
+		int loanNumber = 0;
+		scanf("%d", &loanNumber);
+		int currentUserNumberOfBooks = CheckingUserNumberOfBook(bookHead, name);
+		int currentlyAvailable = CheckingAvailableNumberOfBook(bookHead, title);
+		if (currentUserNumberOfBooks + loanNumber > 5) {
+			printf("Sorry, but you cannot loan more than 5 books, you can loan %d more books\n", 5 - currentUserNumberOfBooks);
 			break;
 		}
-		case 'e': {
-			char name[MAX_LENGTH] = { 0 };
-			printf("Enter new user: \n");
-			scanf(" ");
-			fgets(name, sizeof(name), stdin);
-			name[strcspn(name, "\n")] = '\0'; //removing new line from name
-			if (CheckIfUserExist(bookHead, name) == true)
-				printf("%s is already a user\n", name);
+		else if (currentlyAvailable == 0) {
+			printf("sorry, but we don't have any %s left\n", title);
+			break;
+		}
+		else if (currentlyAvailable < loanNumber) {
+			printf("Sorry, but we only have %d of that book remaining, do you want to loan %d books?(yes/no)\n", currentlyAvailable, currentlyAvailable);
+			char answer[10] = { 0 };
+			scanf(" %s", answer);
+			if (strcmp(answer, "yes") == 0)
+			{
+				for (int i = 0; i < currentlyAvailable; i++)
+					InsertUserToBook(bookHead, name, title, 1);
+				break;
+			}
 			else
-				AllUsersSorted(bookHead, name, 0);
+				break;
+		}
+		for (int i = 0; i < loanNumber; i++)
+			InsertUserToBook(bookHead, name, title, 1);
+		break;
+	}
+	case 'g': {
+		char name[MAX_LENGTH] = { 0 };
+		printf("Enter users name: \n");
+		scanf(" ");
+		fgets(name, sizeof(name), stdin);
+		name[strcspn(name, "\n")] = '\0'; //removing new line from name
+		if (CheckIfUserExist(bookHead, name) == false) {
+			printf("Sorry, but that person is not one of our users\n");
 			break;
 		}
-		case 'f': {
-			char name[MAX_LENGTH] = { 0 };
-			printf("Enter users name: \n");
-			scanf(" ");
-			fgets(name, sizeof(name), stdin);
-			name[strcspn(name, "\n")] = '\0'; //removing new line from name
-			if (CheckIfUserExist(bookHead, name) == false) {
-				printf("Sorry, but that person is not one of our users\n");
-				break;
-			}
-			if (CheckingUserNumberOfBook(bookHead, name) == 5) {
-				printf("Sorry, but you already have 5 books\n");
-				break;
-			}
-			printf("Enter the name of the book you want to loan: \n");
-			char title[MAX_LENGTH] = { 0 };
-			scanf(" ");
-			fgets(title, sizeof(title), stdin);
-			title[strcspn(title, "\n")] = '\0'; //removing new line from name
-			if (CheckIfBookExist(bookHead, title) == false) {
-				printf("Sorry, but we don't have that book\n");
-				break;
-			}
-			printf("Enter the number of books you want to loan: \n");
-			int loanNumber = 0;
-			scanf("%d", &loanNumber);
-			int currentUserNumberOfBooks = CheckingUserNumberOfBook(bookHead, name);
-			int currentlyAvailable = CheckingAvailableNumberOfBook(bookHead, title);
-			if (currentUserNumberOfBooks + loanNumber > 5) {
-				printf("Sorry, but you cannot loan more than 5 books, you can loan %d more books\n", 5 - currentUserNumberOfBooks);
-				break;
-			}
-			else if (currentlyAvailable == 0) {
-				printf("sorry, but we don't have any %s left\n", title);
-				break;
-			}
-			else if (currentlyAvailable < loanNumber) {
-				printf("Sorry, but we only have %d of that book remaining, do you want to loan %d books?(yes/no)\n", currentlyAvailable, currentlyAvailable);
-				char answer[10] = { 0 };
-				scanf(" %s", answer);
-				if (strcmp(answer, "yes") == 0)
-				{
-					for(int i = 0; i < currentlyAvailable; i++)
-						InsertUserToBook(bookHead, name, title, currentlyAvailable);
-					break;
-				}
-				else
-					break;
-			}
-			for(int i = 0; i < loanNumber; i++)
-				InsertUserToBook(bookHead, name, title, 1);
+		printf("Enter the name of the book you want to return: \n");
+		char title[MAX_LENGTH] = { 0 };
+		scanf(" ");
+		fgets(title, sizeof(title), stdin);
+		title[strcspn(title, "\n")] = '\0'; //removing new line from name
+		if (CheckIfBookExist(bookHead, title) == false) {
+			printf("Sorry, but we don't have that book\n");
 			break;
 		}
-		case 'g': {
-			char name[MAX_LENGTH] = { 0 };
-			printf("Enter users name: \n");
-			scanf(" ");
-			fgets(name, sizeof(name), stdin);
-			name[strcspn(name, "\n")] = '\0'; //removing new line from name
-			if (CheckIfUserExist(bookHead, name) == false) {
-				printf("Sorry, but that person is not one of our users\n");
-				break;
-			}
-			printf("Enter the name of the book you want to return: \n");
-			char title[MAX_LENGTH] = { 0 };
-			scanf(" ");
-			fgets(title, sizeof(title), stdin);
-			title[strcspn(title, "\n")] = '\0'; //removing new line from name
-			if (CheckIfBookExist(bookHead, title) == false) {
-				printf("Sorry, but we don't have that book\n");
-				break;
-			}
-			printf("Enter the number of books you want to return: \n");
-			int returnNumber = 0;
-			scanf("%d", &returnNumber);
-			int numberOfUserCertainBook = CheckingUserNumberOfCertainBook(bookHead, title, name);
-			if (returnNumber > numberOfUserCertainBook || numberOfUserCertainBook == 0) {
-				printf("Sorry, but user %s don't have enough books titled %s\n", name, title);
-			}
-			else {
-				for(int i = 0; i < returnNumber; i++)
-					BookReturn(bookHead, name, title, 1);
-			}
+		printf("Enter the number of books you want to return: \n");
+		int returnNumber = 0;
+		scanf("%d", &returnNumber);
+		int numberOfUserCertainBook = CheckingUserNumberOfCertainBook(bookHead, title, name);
+		if (returnNumber > numberOfUserCertainBook || numberOfUserCertainBook == 0) {
+			printf("Sorry, but user %s don't have enough books titled %s\n", name, title);
+		}
+		else {
+			for (int i = 0; i < returnNumber; i++)
+				BookReturn(bookHead, name, title, 1);
+		}
 
-			break;
-		}
-		case 'h': {
-			printf("saving to file library.txt...\n");
-			WriteToFile(fileName, bookHead);
-			AllUserWriteToFile("ID1234.txt", bookHead);
-			break;
-		}
-		case 'x': {
-			printf("exiting...");
-			return;
-		}
-		default: {
-			printf("Invalid choice\n");
-		}
+		break;
+	}
+	case 'h': {
+		printf("saving to file library.txt...\n");
+		WriteToFile(fileName, bookHead);
+		AllUserWriteToFile("ID1234.txt", bookHead);
+		break;
+	}
+	case 'x': {
+		printf("exiting...");
+		return;
+	}
+	default: {
+		printf("Invalid choice\n");
+	}
 	}
 	Menu(bookHead, fileName);
 }
@@ -552,14 +552,14 @@ int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookH
 	userPosition previousUser = currentBook->userHead;
 	while (previousUser != NULL) {
 		if (strcmp(currentUser->name, previousUser->name) == 0 && currentUser != previousUser) {
-			if(currentUser->next != NULL)
+			if (currentUser->next != NULL)
 				currentUser = currentUser->next;
 			previousUser = previousUser->next;
 		}
 		else {
 			userNumberOfBook = CheckingUserNumberOfCertainBook(bookHead, currentBook->title, previousUser->name);
 			fprintf(filePointer, "%s %d\n", previousUser->name, userNumberOfBook);
-			if(currentUser->next != NULL)
+			if (currentUser->next != NULL)
 				currentUser = currentUser->next;
 			previousUser = previousUser->next;
 		}
@@ -593,7 +593,7 @@ int WriteToFile(char* fileName, bookPosition bookHead) {
 		return EXIT_FAILURE;
 	}
 	bookPosition currentBook = bookHead->next;
-	char completeID[ID_LENGTH] = {0};
+	char completeID[ID_LENGTH] = { 0 };
 	int insertAvailable = 0;
 	fprintf(filePointer, "ALL USERS: ID1234\n\n");
 	while (currentBook != NULL) {
