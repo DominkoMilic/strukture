@@ -54,6 +54,7 @@ int UsersAndTheirBooksPrint(bookPosition bookHead);
 int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookHead);
 int AllUserWriteToFile(char* fileName, bookPosition bookHead);
 int NumberOfLoanedBooks(bookPosition currentBook);
+int AddingUsersWithZeroBooks(bookPosition bookHead, char* filename);
 
 int main() {
 
@@ -262,6 +263,7 @@ int ReadingUsers(char* fileName, bookPosition bookHead, char* title) {
 	}
 	while (!feof(filePointerUsers)) {
 		fscanf(filePointerUsers, "%s %s %d\n", userName, userSurname, &numberOfBooks);
+		printf(".%d.\n", numberOfBooks);
 		strcat(userName, " ");
 		strcat(userName, userSurname);
 		for (int i = 0; i < numberOfBooks; i++) {
@@ -418,14 +420,14 @@ void ListPrint(bookPosition bookHead) {
 		printf("USERS: \n");
 		currentUser = currentBook->userHead;
 		while (currentUser != NULL) {
-			printf("%s\n", currentUser->name);
+			printf("%s %d\n", currentUser->name, currentUser->booksNumber);
 			currentUser = currentUser->next;
 		}
 		printf("\n");
 		currentBook = currentBook->next;
 	}
 
-	//PrintUsers(bookHead);
+	PrintUsers(bookHead);
 }
 
 
@@ -436,8 +438,6 @@ void SearchByYear(bookPosition bookHead, int searchYear) {
 		if (current->releaseYear == searchYear) {
 			counter++;
 			printf("TITLE: %s\n", current->title);
-			//printf("AUTHOR: %s\n", current->author);
-			//printf("RELEASE YEAR: %d.\n", current->releaseYear);
 			printf("AVAILABLE: %d\n\n", current->available);
 		}
 		current = current->next;
@@ -454,8 +454,6 @@ void SearchByAuthor(bookPosition bookHead, char* author) {
 		if (strcmp(current->author, author) == 0) {
 			counter++;
 			printf("TITLE: %s\n", current->title);
-			//printf("AUTHOR: %s\n", current->author);
-			//printf("RELEASE YEAR: %d.\n", current->releaseYear);
 			printf("AVAILABLE: %d\n\n", current->available);
 		}
 		current = current->next;
@@ -466,8 +464,7 @@ void SearchByAuthor(bookPosition bookHead, char* author) {
 
 void InsertUserToBook(bookPosition bookHead, char* userName, char* title, int numberOfBooks) {
 	AllUsersSorted(bookHead, userName, numberOfBooks);
-	int newNumberOfBooks = numberOfBooks + CheckingUserNumberOfBook(bookHead, userName);
-	userPosition newUser = CreateNewUser(userName, newNumberOfBooks);
+	userPosition newUser = CreateNewUser(userName, 1);
 	bookPosition currentBook = bookHead->next;
 	while (currentBook != NULL) {
 		if (strcmp(currentBook->title, title) == 0) {
