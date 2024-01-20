@@ -263,7 +263,6 @@ int ReadingUsers(char* fileName, bookPosition bookHead, char* title) {
 	}
 	while (!feof(filePointerUsers)) {
 		fscanf(filePointerUsers, "%s %s %d\n", userName, userSurname, &numberOfBooks);
-		printf(".%d.\n", numberOfBooks);
 		strcat(userName, " ");
 		strcat(userName, userSurname);
 		for (int i = 0; i < numberOfBooks; i++) {
@@ -420,14 +419,14 @@ void ListPrint(bookPosition bookHead) {
 		printf("USERS: \n");
 		currentUser = currentBook->userHead;
 		while (currentUser != NULL) {
-			printf("%s %d\n", currentUser->name, currentUser->booksNumber);
+			printf("%s\n", currentUser->name);
 			currentUser = currentUser->next;
 		}
 		printf("\n");
 		currentBook = currentBook->next;
 	}
 
-	PrintUsers(bookHead);
+	//PrintUsers(bookHead);
 }
 
 
