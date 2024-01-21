@@ -16,7 +16,7 @@ typedef struct User {
 	userPosition next;
 } user;
 
-//naslov, autor, godina izdanja i dostupni primjerci
+
 struct Book;
 typedef struct Book* bookPosition;
 typedef struct Book {
@@ -28,6 +28,7 @@ typedef struct Book {
 	bookPosition next;
 	userPosition userHead;
 } book;
+
 
 bookPosition CreateNewBook(char* title, char* author, int releaseYear, int available, char* bookID);
 void AllBooksSorted(bookPosition bookHead, char* title, char* author, int releaseYear, int available, char* bookID);
