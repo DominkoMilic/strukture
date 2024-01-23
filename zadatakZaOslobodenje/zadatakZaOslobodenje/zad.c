@@ -31,31 +31,31 @@ typedef struct Book {
 
 
 bookPosition CreateNewBook(char* title, char* author, int releaseYear, int available, char* bookID);
+userPosition CreateNewUser(char* name, int numberOfBooks);
 void AllBooksSorted(bookPosition bookHead, char* title, char* author, int releaseYear, int available, char* bookID);
+int AllUsersSorted(bookPosition bookHead, char* name, int numberOfBooks);
+void InsertUserToBook(bookPosition bookHead, char* userName, char* title, int numberOfBooks);
+int AddingUsersWithZeroBooks(bookPosition bookHead, char* filename);
+int ReadFromFile(char* fileName, bookPosition bookHead);
+int ReadingUsers(char* fileName, bookPosition bookHead, char* title);
+int WriteToFile(char* fileName, bookPosition bookHead);
+int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookHead);
+int AllUserWriteToFile(char* fileName, bookPosition bookHead);
+int UsersAndTheirBooksPrint(bookPosition bookHead);
+void PrintUsers(bookPosition bookHead);
 void ListPrint(bookPosition bookHead);
 void Menu(bookPosition bookHead, char* fileName);
 void SearchByYear(bookPosition bookHead, int searchYear);
 void SearchByAuthor(bookPosition bookHead, char* author);
-userPosition CreateNewUser(char* name, int numberOfBooks);
-int AllUsersSorted(bookPosition bookHead, char* name, int numberOfBooks);
-void InsertUserToBook(bookPosition bookHead, char* userName, char* title, int numberOfBooks);
-int ReadFromFile(char* fileName, bookPosition bookHead);
-int WriteToFile(char* fileName, bookPosition bookHead);
-bool CheckIfUserExist(bookPosition bookHead, char* name);
-bool CheckIfBookExist(bookPosition bookHead, char* name);
 int CheckingUserNumberOfBook(bookPosition bookHead, char* name);
 int CheckingAvailableNumberOfBook(bookPosition bookHead, char* title);
-void PrintUsers(bookPosition bookHead);
-int ReadingUsers(char* fileName, bookPosition bookHead, char* title);
 int CheckingUserNumberOfCertainBook(bookPosition bookHead, char* title, char* userName);
+void ChangingUserNumberOfBooks(bookPosition bookHead, char* userName);
+int NumberOfLoanedBooks(bookPosition currentBook);
+bool CheckIfBookExist(bookPosition bookHead, char* name);
+bool CheckIfUserExist(bookPosition bookHead, char* name);
 int BookReturn(bookPosition bookHead, char* userName, char* title, int returnNumber);
 int FreeMemory(userPosition currentUser, userPosition previousUser);
-void ChangingUserNumberOfBooks(bookPosition bookHead, char* userName);
-int UsersAndTheirBooksPrint(bookPosition bookHead);
-int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookHead);
-int AllUserWriteToFile(char* fileName, bookPosition bookHead);
-int NumberOfLoanedBooks(bookPosition currentBook);
-int AddingUsersWithZeroBooks(bookPosition bookHead, char* filename);
 
 int main() {
 
@@ -224,6 +224,7 @@ void Menu(bookPosition bookHead, char* fileName) {
 	Menu(bookHead, fileName);
 }
 
+//reading all for books and ids from main file library.txt
 int ReadFromFile(char* fileName, bookPosition bookHead) {
 	FILE* filePointer = NULL;
 	filePointer = fopen(fileName, "r");
@@ -252,6 +253,7 @@ int ReadFromFile(char* fileName, bookPosition bookHead) {
 	return EXIT_SUCCESS;
 }
 
+//reading users from ID files
 int ReadingUsers(char* fileName, bookPosition bookHead, char* title) {
 	char userName[MAX_LENGTH] = { 0 };
 	char userSurname[MAX_LENGTH] = { 0 };
@@ -274,28 +276,7 @@ int ReadingUsers(char* fileName, bookPosition bookHead, char* title) {
 	return EXIT_SUCCESS;
 }
 
-int ReadingAllUsers(char* fileName, bookPosition bookHead) {
-	char userName[MAX_LENGTH] = { 0 };
-	char userSurname[MAX_LENGTH] = { 0 };
-	int numberOfBooks = 0;
-	FILE* filePointerUsers = NULL;
-	filePointerUsers = fopen(fileName, "r");
-	if (filePointerUsers == NULL) {
-		printf("Error opening %s file", fileName);
-		return EXIT_FAILURE;
-	}
-	while (!feof(filePointerUsers)) {
-		fscanf(filePointerUsers, "%s %s %d\n", userName, userSurname, &numberOfBooks);
-		strcat(userName, " ");
-		strcat(userName, userSurname);
-		for (int i = 0; i < numberOfBooks; i++) {
-			AllUsersSorted(bookHead, userName, numberOfBooks);
-		}
-	}
-	fclose(filePointerUsers);
-	return EXIT_SUCCESS;
-}
-
+//creating new user which is later inserted in sublist
 userPosition CreateNewUser(char* name, int numberOfBooks) {
 	userPosition newUser = NULL;
 	newUser = (userPosition)malloc(sizeof(user));
@@ -311,6 +292,7 @@ userPosition CreateNewUser(char* name, int numberOfBooks) {
 	return newUser;
 }
 
+//creating new book which is later inserted in main list
 bookPosition CreateNewBook(char* title, char* author, int releaseYear, int available, char* bookID) {
 	bookPosition newElement = NULL;
 	newElement = (bookPosition)malloc(sizeof(book));
@@ -330,7 +312,7 @@ bookPosition CreateNewBook(char* title, char* author, int releaseYear, int avail
 	return newElement;
 }
 
-
+//sortedly inserting all users to main sublist
 int AllUsersSorted(bookPosition bookHead, char* name, int numberOfBooks) {
 	userPosition newElement = CreateNewUser(name, numberOfBooks);
 
@@ -370,6 +352,7 @@ int AllUsersSorted(bookPosition bookHead, char* name, int numberOfBooks) {
 	return EXIT_SUCCESS;
 }
 
+//sortedly insert all books to main list
 void AllBooksSorted(bookPosition bookHead, char* title, char* author, int releaseYear, int available, char* bookID) {
 	bookPosition newElement = CreateNewBook(title, author, releaseYear, available, bookID);
 	bookPosition current = bookHead;
@@ -400,6 +383,7 @@ void AllBooksSorted(bookPosition bookHead, char* title, char* author, int releas
 
 }
 
+//printing all users
 void PrintUsers(bookPosition bookHead) {
 	printf("svi useri:\n");
 	userPosition currentUser = bookHead->userHead;
@@ -409,6 +393,7 @@ void PrintUsers(bookPosition bookHead) {
 	}
 }
 
+//printing all books in alphabetical order and their users
 void ListPrint(bookPosition bookHead) {
 	bookPosition currentBook = bookHead->next;
 	userPosition currentUser = NULL;
@@ -430,7 +415,7 @@ void ListPrint(bookPosition bookHead) {
 	//PrintUsers(bookHead);
 }
 
-
+//searching trough main list by book release year
 void SearchByYear(bookPosition bookHead, int searchYear) {
 	bookPosition current = bookHead->next;
 	int counter = 0;
@@ -446,6 +431,7 @@ void SearchByYear(bookPosition bookHead, int searchYear) {
 		printf("Sorry, we don't have any book from that year\n");
 }
 
+//searching trough main list by book author
 void SearchByAuthor(bookPosition bookHead, char* author) {
 	bookPosition current = bookHead->next;
 	int counter = 0;
@@ -462,6 +448,7 @@ void SearchByAuthor(bookPosition bookHead, char* author) {
 		printf("Sorry, we don't have any book from that author\n");
 }
 
+//inserting readed users to certain books sublist
 void InsertUserToBook(bookPosition bookHead, char* userName, char* title, int numberOfBooks) {
 	AllUsersSorted(bookHead, userName, numberOfBooks);
 	userPosition newUser = CreateNewUser(userName, 1);
@@ -484,6 +471,7 @@ void InsertUserToBook(bookPosition bookHead, char* userName, char* title, int nu
 
 }
 
+//checking if user exist in main sublist
 bool CheckIfUserExist(bookPosition bookHead, char* name) {
 	userPosition first = bookHead->userHead;
 	while (first != NULL) {
@@ -495,6 +483,7 @@ bool CheckIfUserExist(bookPosition bookHead, char* name) {
 	return false;
 }
 
+//checking if book exist in main list
 bool CheckIfBookExist(bookPosition bookHead, char* name) {
 	bookPosition current = bookHead->next;
 	while (current != NULL) {
@@ -506,6 +495,7 @@ bool CheckIfBookExist(bookPosition bookHead, char* name) {
 	return false;
 }
 
+//cheking certain user number of curentlly loand books
 int CheckingUserNumberOfBook(bookPosition bookHead, char* name) {
 	userPosition current = bookHead->userHead;
 	while (current != NULL) {
@@ -514,10 +504,10 @@ int CheckingUserNumberOfBook(bookPosition bookHead, char* name) {
 		}
 		current = current->next;
 	}
-
 	return 0;
 }
 
+//checking number of currently available certain book
 int CheckingAvailableNumberOfBook(bookPosition bookHead, char* title) {
 	bookPosition current = bookHead->next;
 	while (current != NULL) {
@@ -526,10 +516,10 @@ int CheckingAvailableNumberOfBook(bookPosition bookHead, char* title) {
 		}
 		current = current->next;
 	}
-
 	return 0;
 }
 
+//writing users that are currently loaning certain book to that book ID...txt
 int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookHead) {
 	FILE* filePointer = NULL;
 	int userNumberOfBook = 0;
@@ -565,6 +555,7 @@ int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookH
 	return EXIT_SUCCESS;
 }
 
+//writing all users names and number of currently loaned books to ID1234.txt 
 int AllUserWriteToFile(char* fileName, bookPosition bookHead) {
 	FILE* filePointer = NULL;
 	int userNumberOfBook = 0;
@@ -582,6 +573,7 @@ int AllUserWriteToFile(char* fileName, bookPosition bookHead) {
 	return EXIT_SUCCESS;
 }
 
+//writing books and their elemets to library.txt
 int WriteToFile(char* fileName, bookPosition bookHead) {
 	FILE* filePointer = NULL;
 	filePointer = fopen(fileName, "w");
@@ -611,7 +603,7 @@ int WriteToFile(char* fileName, bookPosition bookHead) {
 	return EXIT_SUCCESS;
 }
 
-
+//checking how many of certain book is certain user currently loaning
 int CheckingUserNumberOfCertainBook(bookPosition bookHead, char* title, char* userName) {
 	bookPosition currentBook = bookHead->next;
 	userPosition currentUser = currentBook->userHead;
@@ -633,6 +625,7 @@ int CheckingUserNumberOfCertainBook(bookPosition bookHead, char* title, char* us
 	return 0;
 }
 
+//returning book proccess(removing user from book sublist, changing number of book availability)
 int BookReturn(bookPosition bookHead, char* userName, char* title, int returnNumber) {
 	bookPosition currentBook = bookHead->next;
 	userPosition currentUser = currentBook->userHead;
@@ -666,12 +659,14 @@ int BookReturn(bookPosition bookHead, char* userName, char* title, int returnNum
 	return EXIT_SUCCESS;
 }
 
+//removing user from book sublist
 int FreeMemory(userPosition currentUser, userPosition previousUser) {
 	previousUser->next = currentUser->next;
 	free(currentUser);
 	return EXIT_SUCCESS;
 }
 
+//changing number of books for certain user in main sublist
 void ChangingUserNumberOfBooks(bookPosition bookHead, char* userName) {
 	userPosition currentUser = bookHead->userHead;
 	while (currentUser != NULL) {
@@ -681,6 +676,7 @@ void ChangingUserNumberOfBooks(bookPosition bookHead, char* userName) {
 	}
 }
 
+//printing users in alphabetical order and books that they are currently loaning
 int UsersAndTheirBooksPrint(bookPosition bookHead) {
 	userPosition currentUser = bookHead->userHead;
 	bookPosition currentBook = bookHead->next;
@@ -704,6 +700,7 @@ int UsersAndTheirBooksPrint(bookPosition bookHead) {
 	return EXIT_SUCCESS;
 }
 
+//checking number of currently loaned certain books 
 int NumberOfLoanedBooks(bookPosition currentBook) {
 	userPosition currentUser = currentBook->userHead;
 	int counter = 0;
@@ -714,6 +711,7 @@ int NumberOfLoanedBooks(bookPosition currentBook) {
 	return counter;
 }
 
+//adding users that have 0 books to main sublist 
 int AddingUsersWithZeroBooks(bookPosition bookHead, char* fileName) {
 	FILE* filePointer = NULL;
 	filePointer = fopen(fileName, "r");
