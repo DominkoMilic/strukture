@@ -62,6 +62,7 @@ int main() {
 	book bookHead = {
 		 .title = {0},
 		 .author = {0},
+		 .ID = {0},
 		 .releaseYear = 0,
 		 .available = 0,
 		 .next = NULL,
@@ -72,7 +73,7 @@ int main() {
 	char* fileName = "library.txt";
 	ReadFromFile(fileName, &bookHead);
 	AddingUsersWithZeroBooks(&bookHead, "ID1234.txt");
-	AllUserWriteToFile("ID1234.txt", &bookHead);
+	//AllUserWriteToFile("ID1234.txt", &bookHead);
 
 	Menu(&bookHead, fileName);
 
@@ -452,6 +453,10 @@ void SearchByAuthor(bookPosition bookHead, char* author) {
 void InsertUserToBook(bookPosition bookHead, char* userName, char* title, int numberOfBooks) {
 	AllUsersSorted(bookHead, userName, numberOfBooks);
 	userPosition newUser = CreateNewUser(userName, 1);
+	if (!newUser) {
+		printf("error\n");
+		return;
+	}
 	bookPosition currentBook = bookHead->next;
 	while (currentBook != NULL) {
 		if (strcmp(currentBook->title, title) == 0) {
@@ -534,6 +539,7 @@ int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookH
 	else if (currentBook->userHead->next == NULL) {
 		userNumberOfBook = CheckingUserNumberOfCertainBook(bookHead, currentBook->title, currentBook->userHead->name);
 		fprintf(filePointer, "%s %d\n", currentBook->userHead->name, currentBook->userHead->booksNumber);
+		return EXIT_SUCCESS;
 	}
 	userPosition currentUser = currentBook->userHead->next;
 	userPosition previousUser = currentBook->userHead;
@@ -543,7 +549,7 @@ int UserWriteToFile(char* fileName, bookPosition currentBook, bookPosition bookH
 				currentUser = currentUser->next;
 			previousUser = previousUser->next;
 		}
-		else {
+		else{
 			userNumberOfBook = CheckingUserNumberOfCertainBook(bookHead, currentBook->title, previousUser->name);
 			fprintf(filePointer, "%s %d\n", previousUser->name, userNumberOfBook);
 			if (currentUser->next != NULL)
