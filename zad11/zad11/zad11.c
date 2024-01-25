@@ -25,10 +25,10 @@ typedef struct Country
 }country;
 
 int addCountry(countryPosition countryHead, char* name, char* dat);
-int addCity(cityPosition p, char* dat);
+int addCity(cityPosition city, char* dat);
 cityPosition insertCity(cityPosition p, char* name, int residents);
 int countryPrint(countryPosition countryHead);
-int cityPrint(cityPosition p);
+int cityPrint(cityPosition city);
 countryPosition findCountry(countryPosition countryHead, char* name);
 int findCity(cityPosition p, int number);
 
